@@ -16,6 +16,7 @@ from datetime import timedelta
 app = Flask(__name__)
 app.secret_key = 'sistema_vendas_2024'
 
+# ========== alterado 28-10-1845 ==========
 # ========== CONFIGURAÇÃO DO BANCO DE DADOS ==========
 def init_db():
     if os.path.exists('sistema_vendas.db'):
@@ -3521,4 +3522,5 @@ if __name__ == '__main__':
     print("📋 Para usar a impressora:")
     print("   1. pip install escpos")
     print("   2. Configure em: http://localhost:5000/printer_settings")
+
     app.run(debug=True, host='0.0.0.0', port=5000)
