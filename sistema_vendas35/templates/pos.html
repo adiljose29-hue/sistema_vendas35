@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ponto de Venda - Sistema de Vendas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f5f6fa; 
+        }
+        .header { 
+            background: white; 
+            padding: 15px 30px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .header h1 { 
+            color: #2c3e50; 
+            font-size: 24px; 
+        }
+        .user-info { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
+        .nav-menu { 
+            background: #34495e; 
+            padding: 0; 
+        }
+        .nav-menu ul { 
+            list-style: none; 
+            display: flex; 
+        }
+        .nav-menu li a { 
+            color: white; 
+            text-decoration: none; 
+            padding: 15px 25px; 
+            display: block; 
+            transition: background 0.3s; 
+        }
+        .nav-menu li a:hover, .nav-menu li a.active { 
+            background: #3498db; 
+        }
+        .container { 
+            display: flex; 
+            height: calc(100vh - 120px); 
+            gap: 20px; 
+            padding: 20px; 
+        }
+        .products-panel { 
+            flex: 2; 
+            background: white; 
+            border-radius: 10px; 
+            padding: 20px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            overflow-y: auto; 
+        }
+        .cart-panel { 
+            flex: 1; 
+            background: white; 
+            border-radius: 10px; 
+            padding: 20px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .search-box { 
+            margin-bottom: 20px; 
+        }
+        .search-box input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #e1e1e1; 
+            border-radius: 8px; 
+            font-size: 16px; 
+        }
+        .products-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 15px; 
+        }
+        .product-card { 
+            border: 1px solid #e1e1e1; 
+            border-radius: 8px; 
+            padding: 15px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+        }
+        .product-card:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+            border-color: #3498db; 
+        }
+        .product-code { 
+            font-size: 12px; 
+            color: #7f8c8d; 
+            margin-bottom: 5px; 
+        }
+        .product-name { 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            color: #2c3e50; 
+        }
+        .product-price { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #27ae60; 
+            margin-bottom: 5px; 
+        }
+        .product-stock { 
+            font-size: 12px; 
+            color: #95a5a6; 
+        }
+        .cart-items { 
+            flex: 1; 
+            overflow-y: auto; 
+            margin-bottom: 20px; 
+        }
+        .cart-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 10px 0; 
+            border-bottom: 1px solid #ecf0f1; 
+        }
+        .cart-item-info { 
+            flex: 1; 
+        }
+        .cart-item-name { 
+            font-weight: 500; 
+            margin-bottom: 2px; 
+        }
+        .cart-item-details { 
+            font-size: 12px; 
+            color: #7f8c8d; 
+        }
+        .cart-item-actions { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        .quantity-btn { 
+            width: 25px; 
+            height: 25px; 
+            border: 1px solid #bdc3c7; 
+            background: white; 
+            border-radius: 3px; 
+            cursor: pointer; 
+        }
+        .cart-totals { 
+            border-top: 2px solid #ecf0f1; 
+            padding-top: 15px; 
+        }
+        .total-line { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 8px; 
+        }
+        .total-final { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #2c3e50; 
+            border-top: 1px solid #bdc3c7; 
+            padding-top: 10px; 
+        }
+        .payment-methods { 
+            margin: 15px 0; 
+        }
+        .payment-btn { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 5px 0; 
+            border: none; 
+            border-radius: 6px; 
+            font-size: 16px; 
+            cursor: pointer; 
+            transition: background 0.3s; 
+        }
+        .btn-cash { background: #27ae60; color: white; }
+        .btn-card { background: #3498db; color: white; }
+        .btn-transfer { background: #9b59b6; color: white; }
+        .btn-clear { 
+            background: #e74c3c; 
+            color: white; 
+            margin-top: 10px; 
+        }
+        .btn-payment:hover { 
+            opacity: 0.9; 
+        }
+        .alert { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+            display: none; 
+        }
+        .alert-success { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb; 
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛒 Ponto de Venda</h1>
+        <div class="user-info">
+            <span>Bem-vindo, <strong id="userName">{{ session.full_name }}</strong></span>
+            <a href="/logout" style="color: #e74c3c; text-decoration: none;">🚪 Sair</a>
+        </div>
+    </div>
+
+    <nav class="nav-menu">
+        <ul>
+            <li><a href="/pos" class="active">📦 Vendas</a></li>
+            <li><a href="/products">📋 Produtos</a></li>
+            <li><a href="/reports">📊 Relatórios</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Painel de Produtos -->
+        <div class="products-panel">
+            <div class="search-box">
+                <input type="text" id="searchProduct" placeholder="🔍 Pesquisar produto por nome ou código...">
+            </div>
+            <div class="products-grid" id="productsGrid">
+                <!-- Produtos carregados via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Painel do Carrinho -->
+        <div class="cart-panel">
+            <h3>🛍️ Carrinho de Vendas</h3>
+            
+            <div class="cart-items" id="cartItems">
+                <!-- Itens do carrinho -->
+                <div style="text-align: center; color: #7f8c8d; padding: 20px;">
+                    Carrinho vazio
+                </div>
+            </div>
+
+            <div class="cart-totals">
+                <div class="total-line">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">0,00 €</span>
+                </div>
+                <div class="total-line">
+                    <span>IVA (14%):</span>
+                    <span id="iva">0,00 €</span>
+                </div>
+                <div class="total-line total-final">
+                    <span>TOTAL:</span>
+                    <span id="total">0,00 €</span>
+                </div>
+            </div>
+
+            <div class="payment-methods">
+                <h4>💳 Método de Pagamento:</h4>
+                <button class="payment-btn btn-cash" onclick="finalizeSale('Dinheiro')">💵 Dinheiro</button>
+                <button class="payment-btn btn-card" onclick="finalizeSale('Cartão')">💳 Cartão</button>
+                <button class="payment-btn btn-transfer" onclick="finalizeSale('Transferência')">🏦 Transferência</button>
+            </div>
+
+            <button class="payment-btn btn-clear" onclick="clearCart()">🗑️ Limpar Carrinho</button>
+
+            <div id="alert" class="alert"></div>
+        </div>
+    </div>
+
+    <script>
+        let cart = [];
+        let products = [];
+
+        // Carregar produtos
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+                products = await response.json();
+                displayProducts(products);
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+            }
+        }
+
+        // Mostrar produtos
+        function displayProducts(productsToShow) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            productsToShow.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-code">${product.code}</div>
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">${product.sale_price.toFixed(2)} €</div>
+                    <div class="product-stock">Stock: ${product.stock}</div>
+                `;
+                productCard.addEventListener('click', () => addToCart(product));
+                grid.appendChild(productCard);
+            });
+        }
+
+        // Adicionar ao carrinho
+        function addToCart(product) {
+            const existingItem = cart.find(item => item.code === product.code);
+            
+            if (existingItem) {
+                if (existingItem.quantity < product.stock) {
+                    existingItem.quantity++;
+                } else {
+                    showAlert('Stock insuficiente!', 'error');
+                    return;
+                }
+            } else {
+                if (product.stock > 0) {
+                    cart.push({
+                        ...product,
+                        quantity: 1,
+                        line_total: product.sale_price
+                    });
+                } else {
+                    showAlert('Produto sem stock!', 'error');
+                    return;
+                }
+            }
+            
+            updateCartDisplay();
+            showAlert(`${product.name} adicionado ao carrinho!`, 'success');
+        }
+
+        // Atualizar display do carrinho
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cartItems');
+            const subtotalEl = document.getElementById('subtotal');
+            const ivaEl = document.getElementById('iva');
+            const totalEl = document.getElementById('total');
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<div style="text-align: center; color: #7f8c8d; padding: 20px;">Carrinho vazio</div>';
+                subtotalEl.textContent = '0,00 €';
+                ivaEl.textContent = '0,00 €';
+                totalEl.textContent = '0,00 €';
+                return;
+            }
+
+            let subtotal = 0;
+            cartItems.innerHTML = '';
+
+            cart.forEach(item => {
+                const itemTotal = item.sale_price * item.quantity;
+                subtotal += itemTotal;
+
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-details">
+                            ${item.sale_price.toFixed(2)} € × ${item.quantity} = ${itemTotal.toFixed(2)} €
+                        </div>
+                    </div>
+                    <div class="cart-item-actions">
+                        <button class="quantity-btn" onclick="changeQuantity('${item.code}', -1)">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="quantity-btn" onclick="changeQuantity('${item.code}', 1)">+</button>
+                        <button style="margin-left: 10px; color: #e74c3c; border: none; background: none; cursor: pointer;" 
+                                onclick="removeFromCart('${item.code}')">❌</button>
+                    </div>
+                `;
+                cartItems.appendChild(cartItem);
+            });
+
+            const iva = subtotal * 0.14;
+            const total = subtotal + iva;
+
+            subtotalEl.textContent = subtotal.toFixed(2) + ' €';
+            ivaEl.textContent = iva.toFixed(2) + ' €';
+            totalEl.textContent = total.toFixed(2) + ' €';
+        }
+
+        // Alterar quantidade
+        function changeQuantity(productCode, change) {
+            const item = cart.find(item => item.code === productCode);
+            if (item) {
+                const newQuantity = item.quantity + change;
+                if (newQuantity < 1) {
+                    removeFromCart(productCode);
+                } else {
+                    const product = products.find(p => p.code === productCode);
+                    if (newQuantity > product.stock) {
+                        showAlert('Stock insuficiente!', 'error');
+                        return;
+                    }
+                    item.quantity = newQuantity;
+                }
+                updateCartDisplay();
+            }
+        }
+
+        // Remover do carrinho
+        function removeFromCart(productCode) {
+            cart = cart.filter(item => item.code !== productCode);
+            updateCartDisplay();
+        }
+
+        // Limpar carrinho
+        function clearCart() {
+            if (cart.length === 0) return;
+            if (confirm('Tem certeza que deseja limpar o carrinho?')) {
+                cart = [];
+                updateCartDisplay();
+                showAlert('Carrinho limpo!', 'success');
+            }
+        }
+
+        // Finalizar venda
+        async function finalizeSale(paymentMethod) {
+            if (cart.length === 0) {
+                showAlert('Adicione produtos ao carrinho primeiro!', 'error');
+                return;
+            }
+
+            if (!confirm(`Confirmar venda com pagamento em ${paymentMethod}?`)) {
+                return;
+            }
+
+            try {
+                const subtotal = cart.reduce((sum, item) => sum + (item.sale_price * item.quantity), 0);
+                const iva_amount = subtotal * 0.14;
+                const total = subtotal + iva_amount;
+
+                const saleData = {
+                    subtotal: subtotal,
+                    iva_amount: iva_amount,
+                    total: total,
+                    payment_method: paymentMethod,
+                    items: cart.map(item => ({
+                        product_id: item.id,
+                        code: item.code,
+                        name: item.name,
+                        quantity: item.quantity,
+                        unit_price: item.sale_price,
+                        iva_rate: item.iva_rate,
+                        line_total: item.sale_price * item.quantity
+                    }))
+                };
+
+                const response = await fetch('/api/sales', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(saleData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    cart = [];
+                    updateCartDisplay();
+                    await loadProducts(); // Recarregar produtos para atualizar stock
+                } else {
+                    showAlert(result.message, 'error');
+                }
+
+            } catch (error) {
+                showAlert('Erro ao processar venda: ' + error.message, 'error');
+            }
+        }
+
+        // Mostrar alertas
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+
+        // Pesquisar produtos
+        document.getElementById('searchProduct').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(searchTerm) || 
+                product.code.toLowerCase().includes(searchTerm)
+            );
+            displayProducts(filteredProducts);
+        });
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', loadProducts);
+    </script>
+	<!-- DEBUG TEMPORÁRIO - Remover depois -->
+<div style="position: fixed; top: 10px; right: 10px; z-index: 1000; background: white; padding: 10px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+    <h4 style="margin: 0 0 10px 0;">🔧 Debug</h4>
+    <button onclick="resetStock()" style="background: #28a745; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; margin: 2px;">
+        🔄 Reset Stock
+    </button>
+    <button onclick="debugProducts()" style="background: #17a2b8; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; margin: 2px;">
+        🔍 Ver Produtos
+    </button>
+    <button onclick="testAPI()" style="background: #6c757d; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; margin: 2px;">
+        🧪 Testar API
+    </button>
+</div>
+
+<script>
+// Função para resetar stock
+async function resetStock() {
+    if (confirm('Repor stock de todos os produtos para 100?')) {
+        try {
+            const response = await fetch('/api/reset_stock');
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('✅ Stock reposto com sucesso!\n\n' + result.produtos.join('\n'));
+                loadProducts(); // Recarregar produtos
+            } else {
+                alert('❌ Erro: ' + result.message);
+            }
+        } catch (error) {
+            alert('❌ Erro: ' + error.message);
+        }
+    }
+}
+
+// Função para debug dos produtos
+async function debugProducts() {
+    try {
+        const response = await fetch('/api/debug_products');
+        const result = await response.json();
+        
+        let mensagem = `📊 Status dos Produtos:\n\n`;
+        mensagem += `Total: ${result.total_produtos}\n`;
+        mensagem += `Ativos: ${result.produtos_ativos}\n`;
+        mensagem += `Com stock: ${result.produtos_com_stock}\n\n`;
+        
+        result.produtos.forEach(produto => {
+            mensagem += `${produto.status} ${produto.code} - ${produto.name} (Stock: ${produto.stock})\n`;
+        });
+        
+        alert(mensagem);
+    } catch (error) {
+        alert('❌ Erro: ' + error.message);
+    }
+}
+
+// Função para testar a API de produtos
+async function testAPI() {
+    try {
+        console.log("🧪 Testando API de produtos...");
+        const response = await fetch('/api/products');
+        console.log("📡 Status da resposta:", response.status);
+        
+        const produtos = await response.json();
+        console.log("📦 Produtos recebidos:", produtos);
+        
+        alert(`🧪 Teste da API:\n\nStatus: ${response.status}\nProdutos: ${produtos.length}\n\nVerifique o console para detalhes.`);
+    } catch (error) {
+        console.error("❌ Erro no teste:", error);
+        alert('❌ Erro no teste: ' + error.message);
+    }
+}
+
+// Carregar produtos com mais debug
+async function loadProducts() {
+    try {
+        console.log("🔄 Iniciando carregamento de produtos...");
+        const response = await fetch('/api/products');
+        
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        
+        products = await response.json();
+        console.log(`✅ ${products.length} produtos carregados:`, products);
+        
+        if (products.length === 0) {
+            console.warn("⚠️ Nenhum produto foi carregado!");
+            document.getElementById('productsGrid').innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #dc3545;">
+                    <h3>⚠️ Nenhum produto disponível</h3>
+                    <p>Clique em "Reset Stock" para repor os produtos</p>
+                </div>
+            `;
+        } else {
+            displayProducts(products);
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar produtos:', error);
+        document.getElementById('productsGrid').innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #dc3545;">
+                <h3>❌ Erro ao carregar produtos</h3>
+                <p>${error.message}</p>
+                <p>Verifique o console para detalhes</p>
+            </div>
+        `;
+    }
+}
+// DEBUG TEMPORÁRIO - Adicione estas funções
+async function resetStock() {
+    if (confirm('Repor stock de todos os produtos para 100?')) {
+        try {
+            const response = await fetch('/api/reset_stock');
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('✅ Stock reposto com sucesso!\n\n' + result.produtos.join('\n'));
+                loadProducts(); // Recarregar produtos
+            } else {
+                alert('❌ Erro: ' + result.message);
+            }
+        } catch (error) {
+            alert('❌ Erro: ' + error.message);
+        }
+    }
+}
+
+async function debugProducts() {
+    try {
+        const response = await fetch('/api/debug_products');
+        const result = await response.json();
+        
+        let mensagem = `📊 Status dos Produtos:\n\n`;
+        mensagem += `Total: ${result.total_produtos}\n`;
+        mensagem += `Ativos: ${result.produtos_ativos}\n`;
+        mensagem += `Com stock: ${result.produtos_com_stock}\n\n`;
+        
+        result.produtos.forEach(produto => {
+            mensagem += `${produto.status} ${produto.code} - ${produto.name} (Stock: ${produto.stock})\n`;
+        });
+        
+        alert(mensagem);
+    } catch (error) {
+        alert('❌ Erro: ' + error.message);
+    }
+}
+
+async function testAPI() {
+    try {
+        console.log("🧪 Testando API de produtos...");
+        const response = await fetch('/api/products');
+        console.log("📡 Status da resposta:", response.status);
+        
+        const produtos = await response.json();
+        console.log("📦 Produtos recebidos:", produtos);
+        
+        alert(`🧪 Teste da API:\n\nStatus: ${response.status}\nProdutos: ${produtos.length}\n\nVerifique o console para detalhes.`);
+    } catch (error) {
+        console.error("❌ Erro no teste:", error);
+        alert('❌ Erro no teste: ' + error.message);
+    }
+}
+
+// Atualizar a função loadProducts para ter mais debug
+async function loadProducts() {
+    try {
+        console.log("🔄 Iniciando carregamento de produtos...");
+        const response = await fetch('/api/products');
+        
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        
+        products = await response.json();
+        console.log(`✅ ${products.length} produtos carregados:`, products);
+        
+        if (products.length === 0) {
+            console.warn("⚠️ Nenhum produto foi carregado!");
+            document.getElementById('productsGrid').innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #dc3545;">
+                    <h3>⚠️ Nenhum produto disponível</h3>
+                    <p>Clique em "Reset Stock" para repor os produtos</p>
+                </div>
+            `;
+        } else {
+            displayProducts(products);
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar produtos:', error);
+        document.getElementById('productsGrid').innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #dc3545;">
+                <h3>❌ Erro ao carregar produtos</h3>
+                <p>${error.message}</p>
+                <p>Verifique o console para detalhes</p>
+            </div>
+        `;
+    }
+}
+
+// Adicionar botões de debug temporários - Cole isto ANTES do </body>
+document.write(`
+    <div style="position: fixed; top: 10px; right: 10px; z-index: 1000; background: white; padding: 10px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+        <h4 style="margin: 0 0 10px 0;">🔧 Debug</h4>
+        <button onclick="resetStock()" style="background: #28a745; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; margin: 2px;">
+            🔄 Reset Stock
+        </button>
+        <button onclick="debugProducts()" style="background: #17a2b8; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; margin: 2px;">
+            🔍 Ver Produtos
+        </button>
+        <button onclick="testAPI()" style="background: #6c757d; color: white; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; margin: 2px;">
+            🧪 Testar API
+        </button>
+    </div>
+`);
+</script>
+            // Inicializar
+            document.addEventListener('DOMContentLoaded', function() {
+                loadProducts();
+                loadCustomers();
+                setupBarcodeScanner();
+            });
+        </script>
+    </body>
+    </html>
+    ''')	
+</body>
+</html>

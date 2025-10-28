@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Vendas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .login-container { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 15px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 400px; 
+        }
+        .logo { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            color: #333; 
+        }
+        .logo h1 { 
+            font-size: 24px; 
+            margin-bottom: 5px; 
+        }
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            color: #555; 
+            font-weight: 500; 
+        }
+        input[type="text"], input[type="password"] { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 2px solid #e1e1e1; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            transition: border-color 0.3s; 
+        }
+        input:focus { 
+            outline: none; 
+            border-color: #667eea; 
+        }
+        .btn-login { 
+            width: 100%; 
+            padding: 12px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: transform 0.2s; 
+        }
+        .btn-login:hover { 
+            transform: translateY(-2px); 
+        }
+        .test-accounts { 
+            margin-top: 25px; 
+            padding: 15px; 
+            background: #f8f9fa; 
+            border-radius: 8px; 
+            font-size: 14px; 
+        }
+        .test-accounts h3 { 
+            margin-bottom: 10px; 
+            color: #333; 
+        }
+        .alert { 
+            padding: 10px; 
+            margin-bottom: 20px; 
+            border-radius: 5px; 
+            display: none; 
+        }
+        .alert-error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb; 
+        }
+        .alert-success { 
+            background: #d1edff; 
+            color: #155724; 
+            border: 1px solid #c3e6cb; 
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>🛒 Státora de Vendas</h1>
+            <p>Sistema de Gestão Comercial</p>
+        </div>
+        
+        <div id="alert" class="alert"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Usuário:</label>
+                <input type="text" id="username" name="username" value="admin" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" value="admin123" required>
+            </div>
+            
+            <button type="submit" class="btn-login">Entrar no Sistema</button>
+        </form>
+        
+        <div class="test-accounts">
+            <h3>👥 Contas para Teste:</h3>
+            <p><strong>Administrador:</strong> admin / admin123</p>
+            <p><strong>Operador de Caixa:</strong> caixa / caixa123</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(formData)
+            });
+            
+            const result = await response.json();
+            const alert = document.getElementById('alert');
+            
+            if (result.success) {
+                alert.className = 'alert alert-success';
+                alert.textContent = result.message;
+                alert.style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = '/pos';
+                }, 1000);
+            } else {
+                alert.className = 'alert alert-error';
+                alert.textContent = result.message;
+                alert.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

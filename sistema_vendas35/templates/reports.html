@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - Sistema de Vendas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f6fa; }
+        .header { 
+            background: white; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+        .nav-menu { background: #34495e; padding: 0; }
+        .nav-menu ul { list-style: none; display: flex; }
+        .nav-menu li a { color: white; text-decoration: none; padding: 15px 25px; display: block; transition: background 0.3s; }
+        .nav-menu li a:hover { background: #3498db; }
+        .nav-menu li a.active { background: #3498db; }
+        .container { padding: 20px; }
+        .reports-section { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ecf0f1; }
+        th { background: #34495e; color: white; }
+        tr:hover { background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Relatórios de Vendas</h1>
+        <div class="user-info">
+            <span>Bem-vindo, <strong>{{ session.full_name }}</strong></span>
+            <a href="/logout" style="color: #e74c3c; text-decoration: none;">🚪 Sair</a>
+        </div>
+    </div>
+
+    <nav class="nav-menu">
+        <ul>
+            <li><a href="/pos">📦 Vendas</a></li>
+            <li><a href="/products">📋 Produtos</a></li>
+            <li><a href="/reports" class="active">📊 Relatórios</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="reports-section">
+            <h2>Últimas Vendas</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nº Venda</th>
+                        <th>Data/Hora</th>
+                        <th>Operador</th>
+                        <th>Pagamento</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="salesTable">
+                    <!-- Vendas carregadas via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function loadSales() {
+            try {
+                const response = await fetch('/api/sales');
+                const sales = await response.json();
+                displaySales(sales);
+            } catch (error) {
+                console.error('Erro ao carregar vendas:', error);
+            }
+        }
+
+        function displaySales(sales) {
+            const table = document.getElementById('salesTable');
+            table.innerHTML = '';
+
+            sales.forEach(sale => {
+                const row = document.createElement('tr');
+                const date = new Date(sale.created_at).toLocaleString('pt-PT');
+                
+                row.innerHTML = `
+                    <td>${sale.sale_number}</td>
+                    <td>${date}</td>
+                    <td>${sale.cashier}</td>
+                    <td>${sale.payment_method}</td>
+                    <td>${sale.total.toFixed(2)} €</td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadSales);
+    </script>
+</body>
+</html>

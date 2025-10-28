@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Produtos - Sistema de Vendas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f6fa; }
+        .header { 
+            background: white; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+        .nav-menu { background: #34495e; padding: 0; }
+        .nav-menu ul { list-style: none; display: flex; }
+        .nav-menu li a { color: white; text-decoration: none; padding: 15px 25px; display: block; transition: background 0.3s; }
+        .nav-menu li a:hover { background: #3498db; }
+        .nav-menu li a.active { background: #3498db; }
+        .container { padding: 20px; }
+        .products-table { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ecf0f1; }
+        th { background: #34495e; color: white; }
+        tr:hover { background: #f8f9fa; }
+        .low-stock { color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 Gestão de Produtos</h1>
+        <div class="user-info">
+            <span>Bem-vindo, <strong>{{ session.full_name }}</strong></span>
+            <a href="/logout" style="color: #e74c3c; text-decoration: none;">🚪 Sair</a>
+        </div>
+    </div>
+
+    <nav class="nav-menu">
+        <ul>
+            <li><a href="/pos">📦 Vendas</a></li>
+            <li><a href="/products" class="active">📋 Produtos</a></li>
+            <li><a href="/reports">📊 Relatórios</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="products-table">
+            <h2>Lista de Produtos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Preço Venda</th>
+                        <th>Stock</th>
+                        <th>IVA</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTable">
+                    <!-- Produtos carregados via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+                const products = await response.json();
+                displayProducts(products);
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+            }
+        }
+
+        function displayProducts(products) {
+            const table = document.getElementById('productsTable');
+            table.innerHTML = '';
+
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                const stockClass = product.stock < 10 ? 'low-stock' : '';
+                
+                row.innerHTML = `
+                    <td>${product.code}</td>
+                    <td>${product.name}</td>
+                    <td>${product.sale_price.toFixed(2)} €</td>
+                    <td class="${stockClass}">${product.stock}</td>
+                    <td>${(product.iva_rate * 100).toFixed(0)}%</td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProducts);
+    </script>
+</body>
+</html>
